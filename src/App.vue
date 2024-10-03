@@ -1,64 +1,101 @@
 <template>
   <div id="app">
-    <h1>Микроблог</h1>
-    <NewPost @post-added="loadPosts" />
-    <PostList ref="postList" />
+    <header>
+      <nav>
+        <router-link to="/">Главная</router-link> |
+        <router-link to="/login" v-if="!isAuthenticated">Войти</router-link>
+        <router-link to="/register" v-if="!isAuthenticated">Регистрация</router-link>
+        <a href="#" @click.prevent="logout" v-if="isAuthenticated">Выйти</a>
+      </nav>
+    </header>
+    <main>
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </main>
+    <footer>
+      <p>&copy; 2024 Микроблог. Все права защищены.</p>
+    </footer>
   </div>
 </template>
 
 <script>
-import PostList from './components/PostList.vue'
-import NewPost from './components/NewPost.vue'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'App',
-  components: {
-    PostList,
-    NewPost
-  },
-  methods: {
-    loadPosts() {
-      this.$refs.postList.mounted();
+  setup() {
+    const store = useStore()
+    const router = useRouter()
+
+    const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
+
+    const logout = () => {
+      store.dispatch('auth/logout')
+      router.push('/login')
+    }
+
+    return {
+      isAuthenticated,
+      logout
     }
   }
 }
 </script>
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  line-height: 1.6;
-  margin: 0;
-  padding: 20px;
-  background-color: #f4f4f4;
-}
-
 #app {
-  max-width: 800px;
-  margin: 0 auto;
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-h1, h2 {
-  color: #333;
+header {
+  background-color: #f8f9fa;
+  padding: 1rem;
 }
 
-input, button {
-  margin-top: 10px;
+nav {
+  padding: 30px;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+nav a {
+  font-weight: bold;
+  color: #2c3e50;
+  text-decoration: none;
+  margin: 0 10px;
 }
 
-li {
-  background-color: #f8f8f8;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 3px;
+nav a.router-link-exact-active {
+  color: #42b983;
+}
+
+main {
+  flex-grow: 1;
+  padding: 2rem;
+}
+
+footer {
+  background-color: #f8f9fa;
+  padding: 1rem;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
