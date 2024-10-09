@@ -15,10 +15,15 @@ const actions = {
     },
 
     async createPost({ commit }, postData) {
-        const response = await api.post('/posts', postData)
-        const newPost = response.data
-        commit('ADD_POST', newPost)
-        return newPost
+        try {
+            const response = await api.post('/posts', postData)
+            const newPost = response.data
+            commit('ADD_POST', newPost)
+            return newPost
+        } catch (error) {
+            console.error('Ошибка при создании поста:', error)
+            throw error
+        }
     },
 
     async updatePost({ commit }, { id, postData }) {

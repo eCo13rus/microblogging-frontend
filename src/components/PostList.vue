@@ -7,10 +7,10 @@
         <p>{{ post.content }}</p>
         <div class="post-actions">
           <button @click="likePost(post.id)" :class="{ liked: post.liked }">
-            {{ post.likes }} Лайк{{ post.likes !== 1 ? 'ов' : '' }}
+            {{ post.likes || 0 }} Лайк{{ (post.likes !== 1) ? 'ов' : '' }}
           </button>
           <button @click="showComments(post.id)">
-            {{ post.comments.length }} Комментари{{ post.comments.length !== 1 ? 'ев' : 'й' }}
+            {{ post.comments ? post.comments.length : 0 }} Комментари{{ (post.comments && post.comments.length !== 1) ? 'ев' : 'й' }}
           </button>
         </div>
       </li>
@@ -19,46 +19,39 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { defineComponent } from 'vue'
 import { useStore } from 'vuex'
 
-export default {
+export default defineComponent({
   name: 'PostList',
+  props: {
+    posts: {
+      type: Array,
+      required: true
+    }
+  },
   setup() {
     const store = useStore()
-    const posts = ref([])
-
-    const fetchPosts = async () => {
-      try {
-        const response = await store.dispatch('posts/fetchPosts')
-        posts.value = response
-      } catch (error) {
-        console.error('Ошибка при загрузке постов:', error)
-      }
-    }
 
     const likePost = async (postId) => {
       try {
         await store.dispatch('posts/likePost', postId)
-        await fetchPosts() // Обновляем список постов после лайка
       } catch (error) {
         console.error('Ошибка при лайке поста:', error)
       }
     }
 
-    const showComments = () => {
-      // Реализация показа комментариев (можно использовать модальное окно или раскрывающийся список)
+    const showComments = (postId) => {
+      // Реализация показа комментариев
+      console.log('Показать комментарии для поста:', postId)
     }
 
-    onMounted(fetchPosts)
-
     return {
-      posts,
       likePost,
       showComments
     }
   }
-}
+})
 </script>
 
 <style scoped>

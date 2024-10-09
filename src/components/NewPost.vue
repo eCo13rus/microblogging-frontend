@@ -35,7 +35,8 @@ import { useRouter } from 'vue-router'
 
 export default {
   name: 'NewPost',
-  setup() {
+  emits: ['post-created'],
+  setup(props, { emit }) {
     const store = useStore()
     const router = useRouter()
 
@@ -51,15 +52,15 @@ export default {
             title: title.value,
             content: content.value
           })
-          console.log('Новый пост:', newPost) // для отладки
+          console.log('Новый пост:', newPost)
           if (newPost && newPost.id) {
+            emit('post-created', newPost)
             router.push({ name: 'PostView', params: { id: newPost.id.toString() } })
           } else {
             throw new Error('Не удалось получить ID нового поста')
           }
         } catch (error) {
           console.error('Ошибка при создании поста:', error)
-          // Здесь можно добавить отображение ошибки пользователю
         } finally {
           isLoading.value = false
         }
@@ -78,7 +79,7 @@ export default {
 
 <style scoped>
 .new-post {
-  max-width: 500px;
+  max-width: 400px;
   margin: 0 auto;
 }
 

@@ -6,14 +6,14 @@ import api from './services/api'
 
 const token = localStorage.getItem('token')
 if (token) {
-    console.log('Токен найден при загрузке приложения:', token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-    store.dispatch('auth/fetchUser').catch(error => {
-        console.error('Ошибка при проверке токена:', error);
+    store.commit('auth/SET_TOKEN', token)
+
+    // Загружаем данные пользователя при наличии токена
+    store.dispatch('auth/getUserData').catch(error => {
+        console.error('Ошибка при получении данных пользователя:', error)
         store.dispatch('auth/logout')
     })
-} else {
-    console.log('Токен не найден при загрузке приложения');
 }
 
 const app = createApp(App)

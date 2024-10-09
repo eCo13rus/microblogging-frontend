@@ -50,16 +50,13 @@ export default {
         isLoading.value = true
         error.value = ''
         try {
-          console.log('Попытка входа для email:', email.value);
-          const response = await store.dispatch('auth/login', {
+          await store.dispatch('auth/login', {
             email: email.value,
             password: password.value
-          });
-          console.log('Успешный вход, токен получен:', response.data.token);
-          router.push('/') // Перенаправляем на главную страницу после успешного входа
+          })
+          router.push('/')
         } catch (err) {
           error.value = 'Неверный email или пароль'
-          console.error('Ошибка входа:', err)
         } finally {
           isLoading.value = false
         }
@@ -76,51 +73,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.login-form {
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-}
-
-button {
-  width: 100%;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button:hover:not(:disabled) {
-  background-color: #218838;
-}
-
-button:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-}
-
-.error-message {
-  color: #dc3545;
-  margin-top: 1rem;
-}
-</style>
